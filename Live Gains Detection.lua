@@ -54,7 +54,7 @@ end
 local function CustomNotice(text, name)
 	chatMessageEvent({"List",
 		{"FGColor", {a=255, b=100, g=100, r=100}}, {"Text", "["},
-		{"FGColor", {a=255, b=200, g=80,  r=50}},  {"Text", name or "Notice" },
+		{"FGColor", {a=255, b=200, g=80,  r=50}},  {"Text", name or "Notice"},
 		{"FGColor", {a=255, b=100, g=100, r=100}}, {"Text", "] "},
 		{"FGColor", {a=255, b=255, g=255, r=255}}, {"Text", text},
 	}, 0)
