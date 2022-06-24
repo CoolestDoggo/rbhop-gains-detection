@@ -113,6 +113,7 @@ text.TextSize = 30
 text.Text = "Waiting for\ntarget"
 
 local lastKnownKeys = {}
+local lastKnownGain = {}
 local currentScores = {}
 
 local function check(user, frames)
@@ -246,9 +247,18 @@ local function check(user, frames)
 
 	local gain = bestValue[1]
 	local score = bestValue[2]
+	local name = user.Name
 
 	if totalWeight > 80 and score / totalWeight >= 0.5 and gain ~= 1 and tonumber(gain) > 0 then
-		CustomNotice(user.Name .. " just hit 50%+ certainty on irregular gains " .. gain, "GC Live")
+		if lastKnownGain[name] ~= gain then
+			if not lastKnownGain[name] then
+				CustomNotice(name .. " just hit 50%+ certainty on irregular gains " .. gain, "GC Live")
+			else
+				CustomNotice("Possible gain change by " .. name .. " to " .. gain, "GC Live")
+			end
+
+			lastKnownGain[name] = gain
+		end
 	end
 
 	return true
