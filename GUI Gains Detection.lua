@@ -74,9 +74,10 @@ local function numToKeys(number, keys)
 	return returnKeys
 end
 
-local function round(n)
-	-- Accurate to 4 decimal places, good enough
-	return math.round(n * 1e5) / 1e5
+local function round(n, precision)
+	precision = precision or 1e5 -- 4 decimal places, good enough for gains
+
+	return math.round(n * precision) / precision
 end
 
 local function isNaN(n)
@@ -191,7 +192,7 @@ local function checkBot(botID)
 
 		if curTick < 1 then continue end
 
-		local roundedTick = round(curTick)
+		local roundedTick = round(curTick, 100)
 		local curVel = t[3]
 
 		if not lastVel then
@@ -413,19 +414,12 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		return
 	end
 
-	local curTime = round(NWVars.GetNWFloat(specTarget, "TimeNow")) + 1
-	local closest, minDiff = 0, 9e9
+	local curTime = round(NWVars.GetNWFloat(specTarget, "TimeNow"), 100) + 1
 
-	for time, gain in next, gainGuesses do
-		local diff = math.abs(curTime - time)
-
-		if diff < minDiff then
-			closest = gain
-			minDiff = diff
-		end
+	if gainGuesses[curTime] then
+		text.Text = round(tonumber(gainGuesses[curTime]))
 	end
 
-	text.Text = round(tonumber(closest))
 	text.Visible = true
 end)
 
