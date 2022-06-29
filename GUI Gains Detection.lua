@@ -413,17 +413,20 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		return
 	end
 
-	local curTime = math.round(NWVars.GetNWFloat(specTarget, "TimeNow") * 100) / 100 + 1
+	local curTime = round(NWVars.GetNWFloat(specTarget, "TimeNow")) + 1
+	local closest, minDiff = 0, 9e9
 
-	if gainGuesses[curTime] then
-		if tonumber(gainGuesses[curTime]) then
-			text.Text = round(gainGuesses[curTime])
-		else
-			text.Text = gainGuesses[curTime]
+	for i in next, gainGuesses do
+		local diff = math.abs(curTime - i)
+
+		if diff < minDiff then
+			closest = i
+			minDiff = diff
 		end
-
-		text.Visible = true
 	end
+
+	text.Text = round(tonumber(gainGuesses[closest]))
+	text.Visible = true
 end)
 
 if _G.AutoScan and not _G.Subscribed then
