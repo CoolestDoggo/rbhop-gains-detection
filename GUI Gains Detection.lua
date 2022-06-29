@@ -416,16 +416,16 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	local curTime = round(NWVars.GetNWFloat(specTarget, "TimeNow")) + 1
 	local closest, minDiff = 0, 9e9
 
-	for i in next, gainGuesses do
-		local diff = math.abs(curTime - i)
+	for time, gain in next, gainGuesses do
+		local diff = math.abs(curTime - time)
 
 		if diff < minDiff then
-			closest = i
+			closest = gain
 			minDiff = diff
 		end
 	end
 
-	text.Text = round(tonumber(gainGuesses[closest]))
+	text.Text = round(tonumber(closest))
 	text.Visible = true
 end)
 
