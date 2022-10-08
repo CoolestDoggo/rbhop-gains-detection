@@ -292,10 +292,19 @@ local function checkBot(botID)
 		gainGuesses[roundedTick] = guessedGains
 	end
 
+	table.sort(fpsValues, function(a, b) -- Sort from low to high in fps
+		if a and b then
+			return a[2] < b[2]
+		else
+			return false
+		end
+	end)
+
 	local numFrames = #frames2 - 1 -- Subtract 1 because we don't use the first frame
 	local meanFPS = totalFPS / numFrames
 	local stdDevFPS = ((squareTotalFPS - totalFPS ^ 2 / numFrames) / (numFrames - 1)) ^ 0.5
 	local calculationTime = tick() - calculationStart
+	local medianFPS = fpsValues[round(#fpsValues / 2, 1)][2]
 
 	local summaryMessage = "Summary for " .. botInstance.Name .. " (ID " .. botID .. ") (" .. gains .. ")" ..
 		"\nMap:            " .. map().DisplayName.Value .. " / " .. map().name ..
@@ -304,6 +313,7 @@ local function checkBot(botID)
 		"\nAccurate Ticks: " .. accurateCount ..
 		"\nBroken Ticks:   " .. failedTicks ..
 		"\nAverage FPS:    " .. meanFPS ..
+		"\nMedian FPS:     " .. medianFPS ..
 		"\nstdDev FPS:     " .. stdDevFPS ..
 		"\nMinimum FPS:    " .. fpsStats.min .. " (" .. fpsStats.mint .. ")" ..
 		"\nMaximum FPS:    " .. fpsStats.max .. " (" .. fpsStats.maxt .. ")" ..
