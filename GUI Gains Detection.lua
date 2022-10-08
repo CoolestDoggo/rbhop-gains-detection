@@ -395,7 +395,7 @@ local function checkBot(botID)
 		end
 	end
 
-	table.sort(fpsValues, function(a, b)
+	table.sort(fpsValues, function(a, b) -- Sort from low to high in fps timestamp
 		if a and b then
 			return a[1] < b[1]
 		else
