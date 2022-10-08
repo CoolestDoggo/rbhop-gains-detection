@@ -121,6 +121,7 @@ local function checkBot(botID)
 	local warns = 0
 	local fpsStats = {min=9e9, mint=0, max=0, maxt=0}
 	local startTime = frames[1][1][1]
+	local fpsValues = {}
 
 	for i, t in next, frames2 do
 		local prevFrame = frames2[i - 1]
@@ -128,6 +129,8 @@ local function checkBot(botID)
 		if prevFrame then
 			local roundedTick = round(t[1] - startTime)
 			local curFPS = 1 / (t[1] - prevFrame[1])
+
+			fpsValues[i] = {roundedTick, curFPS}
 
 			if curFPS > fpsWarnAt then
 				warns = warns + 1
@@ -392,7 +395,41 @@ local function checkBot(botID)
 		end
 	end
 
-	results[botID] = gainGuesses
+	table.sort(fpsValues, function(a, b)
+		if a and b then
+			return a[1] < b[1]
+		else
+			return false
+		end
+	end)
+
+	results[botID] = {gainGuesses=gainGuesses, fpsValues=setmetatable(fpsValues, {
+		__index = function(self, k) -- Get nearest value if its not there wow!
+			local low, high = 1, #self
+
+			for _ = 1, math.ceil(math.sqrt(#self)) do
+				if low == high then break end
+
+				local mid = math.round((low + high) / 2)
+
+				if self[mid][1] < k then
+					low = mid
+				elseif self[mid][1] > k then
+					high = mid
+				end
+			end
+
+			local localSum = 0
+			local index = math.round((low + high) / 2)
+
+			for i = 0, 29 do
+				localSum = localSum + self[index - i][2]
+			end
+
+			return localSum / 30 -- take average of last 30 frames
+		end
+	})}
+
 	return true
 end
 
@@ -407,17 +444,24 @@ remote.Subscribe("SetSpectating", function(u)
 end)
 
 game:GetService("RunService").RenderStepped:Connect(function()
-	local gainGuesses = results[specTarget and specTarget.BotId]
+	local values = results[specTarget and specTarget.BotId]
 
-	if not (specTarget and gainGuesses) then
+	if not (specTarget and values) then
 		text.Visible = false
 		return
 	end
 
+	local gainGuesses, fpsValues = values.gainGuesses, values.fpsValues
 	local curTime = round(NWVars.GetNWFloat(specTarget, "TimeNow"), 100) + 1
 
 	if gainGuesses[curTime] then
-		text.Text = round(tonumber(gainGuesses[curTime]))
+		local fps = fpsValues[curTime]
+
+		if fps then
+			text.Text = round(tonumber(gainGuesses[curTime])) .. "\n" .. round(fps, 1)
+		else
+			text.Text = round(tonumber(gainGuesses[curTime]))
+		end
 	end
 
 	text.Visible = true
