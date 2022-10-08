@@ -17,6 +17,8 @@ print("--{", tick(), "}-- > Loading")
 local botManager, movement, NWVars, styles, remote
 local cos = math.cos
 local sin = math.sin
+local floor = math.floor
+local r_round = math.round
 local insert = table.insert
 
 for _, t in next, getgc(true) do
@@ -77,7 +79,7 @@ end
 local function round(n, precision)
 	precision = precision or 1e5 -- 4 decimal places, good enough for gains
 
-	return math.round(n * precision) / precision
+	return r_round(n * precision) / precision
 end
 
 local function isNaN(n)
@@ -156,7 +158,7 @@ local function checkBot(botID)
 			end
 		end
 
-		local floored = math.floor(t[1] * 5)
+		local floored = floor(t[1] * 5)
 
 		if not indexedAngles[floored] then
 			indexedAngles[floored] = {}
@@ -187,7 +189,7 @@ local function checkBot(botID)
 	for i, t in next, frames[1] do
 		if i % 5000 == 0 then
 			local progress = (i / frames1Len) * 100
-			print("\nProgress: ", progress, "%\n[" .. string.rep("#", math.floor(progress)) .. string.rep("-", 100 - math.floor(progress)).."]")
+			print("\nProgress: ", progress, "%\n[" .. string.rep("#", floor(progress)) .. string.rep("-", 100 - floor(progress)).."]")
 			task.wait(0.2)
 		end
 
@@ -205,7 +207,7 @@ local function checkBot(botID)
 		end
 
 		local angleBefore, angleAfter
-		local floored = math.floor(curTick * 5)
+		local floored = floor(curTick * 5)
 
 		for a = -1, 1, 1 do
 			a = floored + a
@@ -340,7 +342,7 @@ local function checkBot(botID)
 		end
 
 		local extraMessage = "Extra Info for " .. botInstance.Name .. " (ID " .. botID .. ")" ..
-			"\nAccuracy% mid way (" .. math.floor(#accuracyScore / 2) / 100 .."): " .. accuracyScore[math.floor(#accuracyScore / 2)] * 100 ..
+			"\nAccuracy% mid way (" .. floor(#accuracyScore / 2) / 100 .."): " .. accuracyScore[floor(#accuracyScore / 2)] * 100 ..
 			"\nPredicted Gains:      " .. bestValue[1] .. " (" .. bestValue[1] * gains .. ") at " .. (bestValue[2] / totalWeight) * 100 .. "%"
 
 		warn(extraMessage)
@@ -420,7 +422,7 @@ local function checkBot(botID)
 			for _ = 1, math.ceil(math.sqrt(#self)) do
 				if low == high then break end
 
-				local mid = math.round((low + high) / 2)
+				local mid = r_round((low + high) / 2)
 
 				if self[mid][1] < k then
 					low = mid
@@ -430,7 +432,7 @@ local function checkBot(botID)
 			end
 
 			local localSum = 0
-			local index = math.round((low + high) / 2)
+			local index = r_round((low + high) / 2)
 
 			for i = 0, 29 do
 				localSum = localSum + self[index - i][2]
